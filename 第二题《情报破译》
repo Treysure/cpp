@@ -1,0 +1,62 @@
+/*
+情报破译
+
+我方截获敌方一份文档execute.stdin，发现敌方为了防止泄密，句子单词顺序被翻转了。
+例如，“office. post the attack morning, tomorrow Act”，原文应该是“Act tomorrow morning, attack the post office.”
+组织需要你的时候到了，请你用程序把文档破译出来。
+*/
+
+// 方法二：使用指针
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+	FILE *fpSrc, *fpDes;
+	fpSrc = fopen("execute.stdin", "r");   // 打开[没有则创建]文件读取数据
+	fpDes = fopen("destfile.stdin", "w");  // 打开文件写入数据
+	if (fpSrc == NULL || fpDes == NULL)
+	{
+		printf("文件打开错误！");
+		exit(-1); // 非正常退出
+	}
+						// a[index]现有指针，再有数组！！
+	char *a[30], s[100];// a先有数组，后有指针！！	s 输入字符串,快准狠
+	int index = 0;
+	int hint1 = 0;
+	int i = 0, j = 0;
+
+	while (fscanf(fpSrc, "%s", s) == 1) // 必须 ==1 ，while（0）结束，fsacnf读书字符为1 ，否则为-1
+	{   // 每次读入都会覆盖前面的内容
+		int hint2 = strlen(s);
+
+		a[index] = (char*)malloc( sizeof(char) ); // 为数组中每一个指针元素a[index]开一块内存空间
+		char ch1 = *a[index];
+
+		memcpy( a[index], s, strlen(s));		  // 将单词拷贝到数组中：不要用赋值号，那是赋的地址！
+		char ch2 = *a[index];
+		// a[index][0] = 'c'; 
+		char ch3 = *a[index];
+		a[index++][strlen(s)] = 0;			      // 在每个数组后放置结束符'\0'，不然缓冲区无法存储内容
+	}
+
+
+	for (i = index - 1; i >= 0; --i)
+	{
+		fputs(a[i],fpDes);
+		if (i >= 1 )
+			fputc(' ', fpDes);
+
+		printf("%s ", a[i]);
+	}
+
+
+	fclose(fpSrc);
+	fclose(fpDes); // fcloseall(); 关闭多个文件
+
+	system("pause");
+	return 0;
+}
