@@ -5,7 +5,79 @@
 例如，“office. post the attack morning, tomorrow Act”，原文应该是“Act tomorrow morning, attack the post office.”
 组织需要你的时候到了，请你用程序把文档破译出来。
 */
+方法一：使用容器
+#include <iostream>
+#include <fstream>
+#include <vector>
 
+using namespace std;
+
+int main()
+{
+	ifstream ifs("execute.stdin");
+	char cVal;
+	vector<char> vecSubChar;
+	vector<vector<char>>  vecChar;
+
+	int i = 0, j = 0, NewlineFlag = 0, Cnt = 0;
+
+	while (ifs.get(cVal)) // 这里不能用ifs >> cVal ,>> 标准输入流会漏掉' '
+	{
+		if (cVal != ' ' && cVal != '\n')
+			vecSubChar.push_back(cVal);
+
+		if (cVal == ' ' || cVal == '\n')
+		{
+			++i;
+			vecChar.push_back(vecSubChar);
+			vecSubChar.clear();
+		}
+
+		if (cVal == '\n')
+			NewlineFlag = i;
+
+	}
+	ifs.close();
+
+	vecChar.push_back(vecSubChar);
+	Cnt = i + 1;
+
+	for (i = 0; i < NewlineFlag/2; ++i)
+	{
+		vecSubChar.clear();
+		vecSubChar = vecChar[NewlineFlag-1 - i];
+		vecChar[NewlineFlag-1 - i] = vecChar[i];
+		vecChar[i] = vecSubChar;
+	}
+
+
+
+	for (i = NewlineFlag; i < (Cnt+NewlineFlag)/2; ++i)
+	{
+		vecSubChar.clear();
+		vecSubChar = vecChar[(Cnt-1)+NewlineFlag - i];
+		vecChar[(Cnt-1)+NewlineFlag - i] = vecChar[i];
+		vecChar[i] = vecSubChar;
+	}
+
+
+	for (i = 0; i < Cnt; ++i)
+	{
+		vecSubChar.clear();
+		vecSubChar = vecChar[i];
+
+		if (i == NewlineFlag && NewlineFlag != 0)
+			cout << endl;
+
+		for (j = 0; j != vecSubChar.size(); ++j)
+			cout << vecSubChar[j];
+		cout << " ";
+
+	}
+
+	system("pause");
+	return 0;
+}
 // 方法二：使用指针
 #include <stdio.h>
 #include <stdlib.h>
